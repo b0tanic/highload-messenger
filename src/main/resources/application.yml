@@ -1,0 +1,11 @@
+spring:
+    datasource:
+        url: jdbc:postgresql://127.0.0.1:5432/hm-db
+        username: user
+        password: hackme
+    liquibase:
+        change-log: "classpath:db/init_database.sql"
+    springdoc:
+        enable-kotlin: true
+    thymeleaf:
+        cache: false

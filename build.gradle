@@ -1,0 +1,73 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
+plugins {
+	id 'org.springframework.boot' version '3.2.2'
+	id 'io.spring.dependency-management' version '1.1.4'
+	id 'org.openapi.generator' version "6.6.0"
+	id 'org.jetbrains.kotlin.jvm' version '1.9.22'
+	id 'org.jetbrains.kotlin.plugin.spring' version '1.9.22'
+}
+
+group = "ru.otus"
+version = "1.0.0"
+
+apply plugin: 'org.openapi.generator'
+
+java {
+	sourceCompatibility = '17'
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
+	implementation("org.springframework.boot:spring-boot-starter-web")
+	implementation("org.springframework.boot:spring-boot-starter-jdbc")
+	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+	implementation("org.jetbrains.kotlin:kotlin-reflect")
+	implementation("org.liquibase:liquibase-core")
+	implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.15.2")
+	implementation("jakarta.validation:jakarta.validation-api:3.0.2")
+
+	compileOnly("org.projectlombok:lombok")
+	runtimeOnly("org.postgresql:postgresql")
+	annotationProcessor("org.projectlombok:lombok")
+	testImplementation("org.springframework.boot:spring-boot-starter-test")
+}
+
+tasks.withType(KotlinCompile).configureEach {
+	kotlinOptions {
+		freeCompilerArgs += '-Xjsr305=strict'
+		jvmTarget = '17'
+	}
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
+
+bootJar {
+	archiveFileName = 'app.jar'
+}
+
+//tasks.register('generateFiles', GenerateTask){
+//	generatorName = "kotlin-spring"
+//	validateSpec = true // Валидировать исходную спецификацию. Если неверная, то ошибка
+//	generateModelTests = false // Не генерировать тесты для dto
+//	generateApiTests = false  // Не генерировать тесты api
+//	inputSpec.set("$rootDir/src/main/resources/templates/openapi.json") // откуда берём openapi
+//	outputDir.set("$rootDir/gen") // Где будут лежать сгенерированные классы
+//	configOptions.set([
+//			dateLibrary			 : "kotlin",
+//			library              : "spring-boot",
+//			useSpringBoot3       : "true",
+//			documentationProvider: "none",
+//			annotationLibrary    : "none"
+//	])
+//}
+//
+//tasks.withType(KotlinCompile).configureEach {
+//	dependsOn generateFiles
+//}

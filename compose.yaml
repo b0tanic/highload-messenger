@@ -1,0 +1,30 @@
+version: "3.7"
+
+services:
+  db:
+    container_name: postgres
+    image: postgres:14-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_PASSWORD=hackme
+      - POSTGRES_USER=user
+      - POSTGRES_DB=hm-db
+    networks:
+      - hm-network
+
+  app:
+    container_name: app
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    links:
+      - db
+    networks:
+      - hm-network
+
+networks:
+  hm-network:
+    driver: bridge
