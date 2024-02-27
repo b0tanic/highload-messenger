@@ -9,3 +9,7 @@ spring:
         enable-kotlin: true
     thymeleaf:
         cache: false
+
+#logging:
+#    level:
+#        root: DEBUG
