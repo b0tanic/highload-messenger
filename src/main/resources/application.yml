@@ -4,8 +4,12 @@ spring:
         username: user
         password: hackme
     liquibase:
-        change-log: "classpath:db/init_database.sql"
+        change-log: "classpath:db/changelog.xml"
     springdoc:
         enable-kotlin: true
     thymeleaf:
         cache: false
+
+#logging:
+#    level:
+#        root: DEBUG

@@ -1,6 +1,8 @@
 -- liquibase formatted sql
 
 -- changeset AAvalyan:init_database
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
 CREATE DOMAIN gender CHAR(1)
     CHECK (value IN ( 'F' , 'M' ));
 
@@ -14,7 +16,6 @@ CREATE TABLE users (
     city VARCHAR
 );
 
-CREATE EXTENSION pgcrypto;
 
 CREATE TABLE passwords (
     val VARCHAR,

@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository
 import ru.otus.highloadmessenger.dto.User
 import ru.otus.highloadmessenger.dto.UserRegisterPost200Response
 import ru.otus.highloadmessenger.dto.UserRegisterPostRequest
+import java.time.LocalDate
 import java.util.UUID
 
 
@@ -22,9 +23,11 @@ class UserRepository(private val jdbcTemplate: JdbcTemplate) {
                 "WHERE id = ?"
 
         const val GET_USERS_BY_NAMES = "SELECT id, first_name, second_name, birth_date, sex, biography, city FROM users " +
-                "WHERE first_name like ? and second_name like ?"
+                "WHERE first_name like ? and second_name like ? ORDER BY id"
 
         const val CHECK_PASSWORD = "SELECT EXISTS(SELECT 1 FROM passwords WHERE user_id = ? and val = crypt(?, val))"
+
+        const val COUNT_USERS = "SELECT COUNT(*) FROM users"
     }
 
     fun userGetId(id: String): User? {
@@ -47,12 +50,27 @@ class UserRepository(private val jdbcTemplate: JdbcTemplate) {
     }
 
     fun userRegister(userRegisterPostRequest: UserRegisterPostRequest?): UserRegisterPost200Response {
-        val userId = UUID.randomUUID().toString()
-        jdbcTemplate.update(INSERT_USER, userId, userRegisterPostRequest?.firstName,
-            userRegisterPostRequest?.secondName, userRegisterPostRequest?.birthdate, generateSex(),
-            userRegisterPostRequest?.biography, userRegisterPostRequest?.city
+        return userRegister(
+            userRegisterPostRequest?.firstName,
+            userRegisterPostRequest?.secondName,
+            userRegisterPostRequest?.birthdate,
+            userRegisterPostRequest?.biography,
+            userRegisterPostRequest?.city,
+            userRegisterPostRequest?.password
         )
-        jdbcTemplate.update(INSERT_PASSWORD, userId, userRegisterPostRequest?.password)
+    }
+
+    fun userRegister(
+        firstName: String?,
+        secondName: String?,
+        birthdate: LocalDate?,
+        biography: String?,
+        city: String?,
+        password: String?
+    ): UserRegisterPost200Response {
+        val userId = UUID.randomUUID().toString()
+        jdbcTemplate.update(INSERT_USER, userId, firstName, secondName, birthdate, generateSex(), biography, city)
+        jdbcTemplate.update(INSERT_PASSWORD, userId, password)
         return UserRegisterPost200Response(userId)
     }
 
@@ -72,6 +90,10 @@ class UserRepository(private val jdbcTemplate: JdbcTemplate) {
 
     fun authenticateUser(id: String, password: String): Boolean {
         return jdbcTemplate.queryForObject(CHECK_PASSWORD, Boolean::class.java, id, password)
+    }
+
+    fun count(): Int {
+        return jdbcTemplate.queryForObject(COUNT_USERS, Int::class.java)?:0
     }
 
     fun generateSex(): String {
